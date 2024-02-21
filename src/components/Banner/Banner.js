@@ -1,10 +1,14 @@
 import React from 'react';
 
 const BannerWinContent = ({numberOfGuesses}) => {
+  const numberOfGuessesCaption = numberOfGuesses === 1 ?
+    '1 guess' : `${numberOfGuesses} guesses`;
+
   return (
     <p>
       <strong>Congratulations!</strong> Got it in
-      <strong>{' '}{numberOfGuesses} guesses</strong>.
+      {' '}
+      <strong>{numberOfGuessesCaption}</strong>.
     </p>
   );
 };
