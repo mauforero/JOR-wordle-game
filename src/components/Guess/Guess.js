@@ -2,7 +2,6 @@ import React from 'react';
 import { range } from '../../utils';
 
 function Guess({value}) {
-  console.log(value);
   return (
     <p className='guess'>
       {value ? (
