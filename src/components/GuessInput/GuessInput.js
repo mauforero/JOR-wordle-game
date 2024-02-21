@@ -18,6 +18,7 @@ const GuessInput = ({handleGuessSubmission}) => {
         value={guess}
         onChange={(event) => setGuess(event.target.value.toUpperCase())}
         pattern="[a-zA-Z]{5}"
+        maxLength={5}
         required={true}
         title="Enter a 5 letter word"
       />
