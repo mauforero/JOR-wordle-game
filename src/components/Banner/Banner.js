@@ -19,7 +19,7 @@ const BannerLoseContent = ({answer}) => {
   );
 };
 
-function Banner({hasWon, answer, numberOfGuesses}) {
+function Banner({hasWon, answer, numberOfGuesses, restartHandler}) {
   const bannerClass = hasWon ? 'happy' : 'sad';
   return (
     <div className={`banner ${bannerClass}`}>
@@ -28,6 +28,7 @@ function Banner({hasWon, answer, numberOfGuesses}) {
           <BannerWinContent numberOfGuesses={numberOfGuesses} /> :
           <BannerLoseContent answer={answer} />
       }
+      <button onClick={restartHandler}>Restart Game</button>
     </div>
   );
 }

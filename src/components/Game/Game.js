@@ -7,12 +7,16 @@ import { checkGuess } from '../../game-helpers';
 import { sample } from '../../utils';
 import { WORDS } from '../../data';
 
-// Pick a random word on every pageload.
-const answer = sample(WORDS);
-// To make debugging easier, we'll log the solution in the console.
-console.info({ answer });
-
 function Game() {
+  const getRandomAnswer = () => {
+    // Pick a random word
+    const answer = sample(WORDS);
+    // To make debugging easier, we'll log the solution in the console.
+    console.info({ answer });
+    return answer;
+  };
+
+  const [answer, setAnswer] = React.useState(getRandomAnswer);
   const [guesses, setGuesses] = React.useState([]);
   const [hasEnded, setHasEnded] = React.useState(false);
   const [hasWon, setHasWon] = React.useState(false);
@@ -39,6 +43,13 @@ function Game() {
 
   };
 
+  const restartHandler = () => {
+    setAnswer(getRandomAnswer);
+    setGuesses([]);
+    setHasEnded(false);
+    setHasWon(false);
+  }
+
   // Check if the guess is correct by filtering all the letters with 
   // a 'correct' status and evaluate their quantity
   const checkForCorrectGuess = (value) => {
@@ -52,7 +63,12 @@ function Game() {
       {
         !hasEnded ? 
         <GuessInput handleGuessSubmission={handleGuessSubmission} /> :
-        <Banner hasWon={hasWon} answer={answer} numberOfGuesses={guesses.length} /> 
+        <Banner 
+          hasWon={hasWon} 
+          answer={answer} 
+          numberOfGuesses={guesses.length} 
+          restartHandler={restartHandler} 
+        /> 
       }
     </>
   );
