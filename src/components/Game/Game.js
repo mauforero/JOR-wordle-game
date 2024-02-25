@@ -6,6 +6,7 @@ import { NUM_OF_GUESSES_ALLOWED as maxGuesses } from '../../constants';
 import { checkGuess } from '../../game-helpers';
 import { sample } from '../../utils';
 import { WORDS } from '../../data';
+import LettersGuide from '../LettersGuide/LettersGuide';
 
 function Game() {
   const getRandomAnswer = () => {
@@ -18,17 +19,19 @@ function Game() {
 
   const [answer, setAnswer] = React.useState(getRandomAnswer);
   const [guesses, setGuesses] = React.useState([]);
+  const [guessedLetters, setGuessedLetters] = React.useState([]);
   const [hasEnded, setHasEnded] = React.useState(false);
   const [hasWon, setHasWon] = React.useState(false);
 
   const handleGuessSubmission = (guess) => {
-    // Add the guess
+    // Add the guess to state
     const newGuess = {
       value: checkGuess(guess, answer),
       id: crypto.randomUUID(),
     };
     const nextGuesses = [...guesses, newGuess];
     setGuesses(nextGuesses);
+    checkForGuessedLetters(newGuess.value);
 
     // Check if the user has guessed the word
     if (checkForCorrectGuess(newGuess.value)) {
@@ -43,18 +46,44 @@ function Game() {
 
   };
 
+  // Reset all state on restart game
   const restartHandler = () => {
-    setAnswer(getRandomAnswer);
     setGuesses([]);
+    setGuessedLetters([]);
     setHasEnded(false);
     setHasWon(false);
+    setAnswer(getRandomAnswer);
   }
 
-  // Check if the guess is correct by filtering all the letters with 
-  // a 'correct' status and evaluate their quantity
+  // The guess is right if all the letters have a 'correct' status
   const checkForCorrectGuess = (value) => {
     const correctLetters = value.filter(({status}) => status === 'correct' );
     return (correctLetters.length >= 5);
+  };
+
+  // Check if the guess has correct or misplaced letters and 
+  // update the guessedLetters state
+  const checkForGuessedLetters = (newGuess) => {
+    const currentLetters = [...guessedLetters];
+    let newLetters = [];
+
+    newGuess.forEach(newLetter => {
+      // check if the letter is already stored
+      const letterIndex = currentLetters.findIndex((curr) => (
+        newLetter.letter === curr.letter
+      ));
+
+      // If not stored, store it
+      if (letterIndex < 0) {
+        newLetters.push(newLetter);
+      } else {
+        // If is already stored but now is in the right position, update the stored letter status
+        if (newLetter.status === 'correct') currentLetters[letterIndex] = newLetter;
+      }
+    });
+
+    const nextGuessedLetters = [...currentLetters, ...newLetters];
+    setGuessedLetters(nextGuessedLetters);
   };
 
   return (
@@ -62,7 +91,11 @@ function Game() {
       <GuessResults answer={answer} guesses={guesses} />
       {
         !hasEnded ? 
-        <GuessInput handleGuessSubmission={handleGuessSubmission} /> :
+        <>
+          <GuessInput handleGuessSubmission={handleGuessSubmission} />
+          <LettersGuide guessedLetters={guessedLetters} />
+        </>
+        :
         <Banner 
           hasWon={hasWon} 
           answer={answer} 
